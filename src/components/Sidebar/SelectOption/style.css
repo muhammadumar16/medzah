@@ -1,0 +1,24 @@
+.sidebar-submenu ul {
+  padding: 5px 0;
+}
+
+.sidebar-submenu ul li {
+  padding-right: 25px;
+  font-size: 14px;
+}
+
+.sidebar-submenu ul li a:before {
+  content: "\f09df" !important;
+  color: #f8f9fa;
+  font-family: "Material Design Icons";
+  margin-left: 4px;
+  font-size: 16px;
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+.sidebar-submenu ul li a .badge,
+.sidebar-submenu ul li a .label {
+  float: left;
+  margin-top: 0px;
+}

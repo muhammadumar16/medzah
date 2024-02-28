@@ -1,0 +1,20 @@
+/* .sidebar-dropdown > a:after {
+  content: "\f0142" !important;
+  color: #f8f9fa;
+  font-family: "Material Design Icons";
+  font-size: 14px;
+  position: absolute;
+  left: 15px;
+  top: 17px;
+  -webkit-transition: all 0.3s ease;
+  transition: all 0.3s ease;
+}
+.sidebar-dropdown.active > a:after {
+  -webkit-transform: rotate(-90deg);
+  transform: rotate(-90deg);
+  left: 17px;
+}
+.sidebar-dropdown:hover > a:after,
+.sidebar-dropdown.active > a:after {
+  color: #ffffff;
+} */

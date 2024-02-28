@@ -1,0 +1,18 @@
+.table-header {
+  background-color: #343a40; /* Dark color */
+  color: white; /* Text color */
+}
+.btn-group .dropdown-toggle:after {
+  content: "";
+  position: relative;
+  right: -12px;
+  top: -2px;
+  border: solid #fff;
+  border-radius: 0.5px;
+  border-width: 0 2px 2px 0;
+  padding: 3px;
+  -webkit-transform: rotate(45deg);
+  transform: rotate(45deg);
+  margin-left: 0;
+  vertical-align: 0;
+}
