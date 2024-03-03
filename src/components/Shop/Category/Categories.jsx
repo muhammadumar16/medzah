@@ -7,7 +7,7 @@ import { currencySymbol } from "utility/Currency";
 
 const Categories = (props) => {
   const { select } = props;
-  console.log("DATA", select);
+
   const truncateDescription = (description) => {
     if (!description) return "";
     const words = description.split(" ");
@@ -16,8 +16,8 @@ const Categories = (props) => {
   };
   return (
     <>
-      {select.map((item) => (
-        <div className="col mt-4" key={item.Id}>
+      {select.map((item, index) => (
+        <div className="col mt-4" key={index}>
           <div className="card shop-list border-0 overflow-hidden rounded">
             {/* {select?.productBadges?.length && (
           <ProductBadges ProductBadges={select?.productBadges} />
@@ -29,7 +29,7 @@ const Categories = (props) => {
           )} */}
               <Link to={`/productdetails/${item.Id}`}>
                 <img
-                  src={item?.lstProductImages[0].ProductImage}
+                  src={item?.lstProductImages?.[0]?.ProductImage}
                   className="img-fluid"
                   alt={`${item?.description}`}
                 />
@@ -65,7 +65,7 @@ const Categories = (props) => {
                 <h6 className="text-dark small fst-italic mb-0 mt-1">
                   Price:{" "}
                   <strong>
-                    {currencySymbol} {item?.Price.toFixed(2)}
+                    {currencySymbol} {(item?.Price).toFixed(2)}
                   </strong>
                   {/* <del className="text-danger ms-2">
                     {select?.delPrice}

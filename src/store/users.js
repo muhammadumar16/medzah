@@ -34,8 +34,6 @@ const userSlice = createSlice({
     },
 
     userLoggedIn: (state, { payload }) => {
-      console.log("payload", payload);
-      console.log("Status Code", payload.Status);
       state.loginError = false;
       state.authorizationError = false;
 
@@ -101,7 +99,6 @@ const userSlice = createSlice({
       };
       localStorage.setItem("loggedUserInfo", JSON.stringify(user));
       state.loggedUser = user;
-      console.log("User", user);
     },
     userLoggedOut: (state, action) => {
       localStorage.removeItem("loggedUserInfo");
@@ -118,8 +115,6 @@ const userSlice = createSlice({
       state.profileLoader = false;
     },
     userProfileSuccess: (state, { payload }) => {
-      console.log("Token", token);
-      console.log("payload profile=>>", payload.Data);
       state.userProfile = payload.Data;
       state.profileLoader = false;
     },

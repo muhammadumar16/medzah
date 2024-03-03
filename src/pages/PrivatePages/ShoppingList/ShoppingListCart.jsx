@@ -11,11 +11,13 @@ export const ShoppingListCart = () => {
     (state) => state?.entities?.cart?.shoppinglist
   );
   const filteredList = shoppinglist.filter(
-    (item) => item.ShoppingCartID === parseInt(id)
+    (item) => item.ShoppingListID === parseInt(id)
   );
+  console.log("Filtered Shopping List=>>>", filteredList);
   const data = filteredList?.[0];
   const dispatch = useDispatch();
 
+  console.log("Add item To Cart Data", data);
   const handleAddToCart = () => {
     dispatch(replaceCartWithShoppingList(data));
     toast.success("Added Items To Your Cart");

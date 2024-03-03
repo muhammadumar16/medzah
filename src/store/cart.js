@@ -12,20 +12,22 @@ const cartSlice = createSlice({
     cart: [],
     shoppinglist: [],
     shoppingListLoader: false,
+    allAddress: [],
+    allOrders: [],
   },
   reducers: {
-    allProducts: (state, action) => {
+    setAllProducts: (state, action) => {
       state.products = action.payload;
     },
 
     addToCart: (state, action) => {
-      const { Id, quantity: localQuantity, UnitID } = action.payload;
+      const { Id, quantity: localQuantity, UnitID } = action?.payload;
       console.log(UnitID);
       if (!UnitID) {
         toast.error("Please Select any unit");
         return state;
       } else {
-        const itemInCart = state.cart.find((item) => item.Id === Id);
+        const itemInCart = state?.cart?.find((item) => item?.Id === Id);
 
         if (itemInCart) {
           itemInCart.quantity += localQuantity;
@@ -53,27 +55,30 @@ const cartSlice = createSlice({
       }
     },
     removeCartItem: (state, action) => {
-      const removeItem = state.cart.filter(
+      const removeItem = state?.cart?.filter(
         (item) => item.Id !== action.payload
       );
       state.cart = removeItem;
     },
+    removeAllCartItems: (state, action) => {
+      state.cart = [];
+    },
     addShoppingList: (state, action) => {
-      console.log("action payload=>>", action.payload);
       state.shoppinglist = action.payload;
     },
     removeShoppingList: (state, action) => {
-      const removeItem = state.shoppinglist.filter(
-        (list) => list.ShoppingCartID !== action.payload
+      const removeItem = state.shoppinglist?.filter(
+        (list) => list.ShoppingListID !== action.payload
       );
       state.shoppinglist = removeItem;
     },
     updateUnitId: (state, action) => {
-      const { itemId, unitId, UnitTitle } = action.payload;
-      const item = state.cart.find((item) => item.Id === itemId);
+      const { itemId, unitId, UnitTitle, Price } = action.payload;
+      const item = state.cart?.find((item) => item.Id === itemId);
       if (item) {
         item.UnitID = unitId;
         item.UnitTitle = UnitTitle;
+        item.Price = Price;
       }
     },
 
@@ -89,23 +94,24 @@ const cartSlice = createSlice({
     },
 
     removeShoppingListItem: (state, action) => {
-      state.shoppinglist = state.shoppinglist.map((list) => ({
+      state.shoppinglist = state.shoppinglist?.map((list) => ({
         ...list,
-        lstshoppingDetails: list.lstshoppingDetails.filter(
-          (item) => item.ShoppingCardDetailID !== action.payload
+        lstshoppingDetails: list.lstshoppingDetails?.filter(
+          (item) => item.ShoppingListDetailID !== action.payload
         ),
       }));
     },
     updateShoppingListUnitId: (state, action) => {
-      const { itemId, unitId, UnitTitle } = action.payload;
-      state.shoppinglist = state.shoppinglist.map((list) => ({
+      const { itemId, unitId, UnitTitle, Price } = action.payload;
+      state.shoppinglist = state.shoppinglist?.map((list) => ({
         ...list,
-        lstshoppingDetails: list.lstshoppingDetails.map((item) =>
-          item.ShoppingCardDetailID === itemId
+        lstshoppingDetails: list.lstshoppingDetails?.map((item) =>
+          item.ShoppingListDetailID === itemId
             ? {
                 ...item,
                 UnitID: unitId,
                 UnitTitle,
+                Price: Price,
               }
             : item
         ),
@@ -113,10 +119,10 @@ const cartSlice = createSlice({
     },
     incrementShoppingListQuantity: (state, action) => {
       const itemId = action.payload;
-      state.shoppinglist = state.shoppinglist.map((list) => ({
+      state.shoppinglist = state.shoppinglist?.map((list) => ({
         ...list,
-        lstshoppingDetails: list.lstshoppingDetails.map((item) =>
-          item.ShoppingCardDetailID === itemId
+        lstshoppingDetails: list.lstshoppingDetails?.map((item) =>
+          item.ShoppingListDetailID === itemId
             ? {
                 ...item,
                 Quantity: item.Quantity + 1,
@@ -127,10 +133,10 @@ const cartSlice = createSlice({
     },
     decrementShoppingListQuantity: (state, action) => {
       const itemId = action.payload;
-      state.shoppinglist = state.shoppinglist.map((list) => ({
+      state.shoppinglist = state.shoppinglist?.map((list) => ({
         ...list,
-        lstshoppingDetails: list.lstshoppingDetails.map((item) =>
-          item.ShoppingCardDetailID === itemId
+        lstshoppingDetails: list.lstshoppingDetails?.map((item) =>
+          item.ShoppingListDetailID === itemId
             ? {
                 ...item,
                 Quantity: item.Quantity > 0 ? item.Quantity - 1 : 0,
@@ -140,7 +146,7 @@ const cartSlice = createSlice({
       }));
     },
     replaceCartWithShoppingList: (state, action) => {
-      const shoppingListItems = action.payload.lstshoppingDetails.map(
+      const shoppingListItems = action.payload.lstshoppingDetails?.map(
         (item) => ({
           Id: item.ProductID,
           ManufactureName: item.ManufactureName,
@@ -156,16 +162,23 @@ const cartSlice = createSlice({
           UnitTitle: item.UnitTitle,
           Price: item.Price,
           lstProductUnitAssociates: item.lstProductUnitAssociates,
+          ProductID: item.ProductID,
         })
       );
 
       state.cart = shoppingListItems;
     },
+    setAllAddress: (state, action) => {
+      state.allAddress = action.payload;
+    },
+    setAllOrders: (state, action) => {
+      state.allOrders = action.payload;
+    },
   },
 });
 
 export const {
-  allProducts,
+  setAllProducts,
   addToCart,
   removeCartItem,
   incrementQuantity,
@@ -181,13 +194,16 @@ export const {
   decrementShoppingListQuantity,
   updateShoppingListUnitId,
   replaceCartWithShoppingList,
+  setAllAddress,
+  removeAllCartItems,
+  setAllOrders,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;
 
 export const GetAllShoppingList = () => {
   return apiCallBegan({
-    url: `ShoppingCartInfo/ShoppingCartList`,
+    url: `ShoppingListInfo/GetShoppingList`,
     method: "GET",
     headers: {
       Authorization: `${token}`,

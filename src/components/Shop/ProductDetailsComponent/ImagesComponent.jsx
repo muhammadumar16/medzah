@@ -7,7 +7,7 @@ const ImagesComponent = (props) => {
         <div className="tiny-single-item">
           <div className="tiny-slide">
             <img
-              src={`${item?.lstProductImages[0].ProductImage}`}
+              src={`${item?.lstProductImages?.[0]?.ProductImage}`}
               className="img-fluid rounded"
               alt="Image"
               // style={{ height: 400, width: 400 }}

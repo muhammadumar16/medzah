@@ -6,16 +6,20 @@ import ProductApi from "services/Product.service";
 import { GetAllShoppingList } from "store/cart";
 import Loader from "utility/Loader";
 import "./tableheader.css";
+import { useEffect } from "react";
 
 export const ShoppingList = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const deleteShoppingList = useAPI(ProductApi.deleteShoppingList);
   const ListItems = useSelector((state) => state?.entities?.cart?.shoppinglist);
+  console.log("Shopping List=>>>>>", ListItems);
   const loading = useSelector(
     (state) => state?.entities?.cart?.shoppingListLoader
   );
-
+  useEffect(() => {
+    dispatch(GetAllShoppingList());
+  }, [dispatch]);
   const handleRemoveList = async (itemId) => {
     try {
       const result = await deleteShoppingList.request(itemId);
@@ -29,7 +33,6 @@ export const ShoppingList = () => {
     }
   };
   const onClickHandler = (id, item) => {
-    // console.log("Item and ID", id, item);
     navigate(`/shoppinglistcart/${id}`);
   };
 
@@ -71,7 +74,7 @@ export const ShoppingList = () => {
                     {ListItems?.map((item, index) => (
                       <tr key={index}>
                         <td>{index + 1}</td>
-                        <td>{item.ShoppingCartTitle}</td>
+                        <td>{item.ShoppingListTitle}</td>
                         <td>{item.Remarks}</td>
                         <td>
                           <div className="btn-group dropdown-danger me-2 mt-2 ">
@@ -84,22 +87,22 @@ export const ShoppingList = () => {
                             >
                               <span
                                 onClick={() =>
-                                  onClickHandler(item.ShoppingCartID, item)
+                                  onClickHandler(item.ShoppingListID, item)
                                 }
                               >
                                 View
                               </span>
                             </button>
                             <div className="dropdown-menu">
-                              <a
-                                href="javascript:void(0)"
+                              <Link
+                                to="#"
                                 onClick={() =>
-                                  handleRemoveList(item.ShoppingCartID)
+                                  handleRemoveList(item.ShoppingListID)
                                 }
                                 className="dropdown-item"
                               >
                                 Delete
-                              </a>
+                              </Link>
                             </div>
                           </div>
                         </td>

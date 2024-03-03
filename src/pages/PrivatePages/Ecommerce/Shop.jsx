@@ -12,13 +12,39 @@ import feather from "feather-icons";
 import TopCategories from "components/Shop/TopCategories";
 import { TOPCATEGORIES } from "constants/topCategoriesConstants";
 // import { allProducts } from "constants/Products/productsDetails";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import useAPI from "hooks/useAPI";
+import ProductApi from "services/Product.service";
+import Loader from "utility/Loader";
+import { setAllProducts } from "store/cart";
 
 export const Shop = () => {
+  const dispatch = useDispatch();
   const searchTerm = useSelector((state) => state?.entities?.users?.searchTerm);
-  const allProducts = useSelector((state) => state?.entities?.cart?.products);
-  const [filteredProducts, setFilteredProducts] = useState(allProducts);
-  console.log("All Products Shop =>>", allProducts);
+  const storesProducts = useSelector(
+    (state) => state?.entities?.cart?.products
+  );
+  const [filteredProducts, setFilteredProducts] = useState(storesProducts);
+  const UserData = JSON.parse(localStorage.getItem("loggedUserInfo"));
+
+  const allproducts = useAPI(ProductApi.getAllProducts);
+  const [loading, setLoading] = useState(true);
+  const getAllproducts = async () => {
+    try {
+      setLoading(true);
+      const result = await allproducts.request();
+      // console.log("result=>>", result.data.Data);
+      dispatch(setAllProducts(result?.data?.Data));
+    } catch (error) {
+      console.log("Error Fetching Products Data =>>", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getAllproducts();
+  }, []);
 
   useEffect(() => {
     feather.replace();
@@ -27,9 +53,9 @@ export const Shop = () => {
 
   const filterProducts = (term) => {
     if (!term) {
-      setFilteredProducts(allProducts);
+      setFilteredProducts(storesProducts);
     } else {
-      const filtered = allProducts.filter(
+      const filtered = storesProducts.filter(
         (product) =>
           product.ProductTitle.toLowerCase().includes(term.toLowerCase()) ||
           product.Sku.toLowerCase().includes(term.toLowerCase())
@@ -45,26 +71,29 @@ export const Shop = () => {
   };
   return (
     <>
-      <div className="container-fluid">
-        <div className="layout-specing">
-          <div className="d-md-flex justify-content-between">
-            <div>
-              <h5 className="mb-0">Shop</h5>
-              <nav aria-label="breadcrumb" className="d-inline-block mt-1">
-                <ul className="breadcrumb breadcrumb-muted bg-transparent rounded mb-0 p-0">
-                  <li className="breadcrumb-item text-capitalize">
-                    <Link to="/">Medzah</Link>
-                  </li>
-                  <li
-                    className="breadcrumb-item text-capitalize active"
-                    aria-current="page"
-                  >
-                    Shop
-                  </li>
-                </ul>
-              </nav>
-            </div>
-            {/* <div className="mt-4 mt-sm-0">
+      {loading ? (
+        <Loader />
+      ) : (
+        <div className="container-fluid">
+          <div className="layout-specing">
+            <div className="d-md-flex justify-content-between">
+              <div>
+                <h5 className="mb-0">Shop</h5>
+                <nav aria-label="breadcrumb" className="d-inline-block mt-1">
+                  <ul className="breadcrumb breadcrumb-muted bg-transparent rounded mb-0 p-0">
+                    <li className="breadcrumb-item text-capitalize">
+                      <Link to="/">Medzah</Link>
+                    </li>
+                    <li
+                      className="breadcrumb-item text-capitalize active"
+                      aria-current="page"
+                    >
+                      Shop
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+              {/* <div className="mt-4 mt-sm-0">
               <button
                 className="btn btn-primary"
                 data-bs-toggle="modal"
@@ -73,34 +102,34 @@ export const Shop = () => {
                 Add Product
               </button>
             </div> */}
-          </div>
-          <div className="row mt-4">
-            <div className="col-12">
-              <h5 className="mb-0">All Products</h5>
             </div>
-            {/*end col*/}
-          </div>
-          {filteredProducts?.length === 0 ? (
-            <p style={{ marginTop: 20, color: "red" }}>
-              Sorry, we couldn't find any products matching "{searchTerm}".
-              Please try a different search term.
-            </p>
-          ) : (
-            <div className="row row-cols-xl-5 row-cols-lg-4 row-cols-md-2 row-cols-1">
-              <Categories
-                select={filteredProducts ? filteredProducts : allProducts}
-                selectHandler={selectHandler}
-              />
+            <div className="row mt-4">
+              <div className="col-12">
+                <h5 className="mb-0">All Products</h5>
+              </div>
+              {/*end col*/}
             </div>
-          )}
+            {filteredProducts?.length === 0 ? (
+              <p style={{ marginTop: 20, color: "red" }}>
+                Sorry, we couldn't find any products matching "{searchTerm}".
+                Please try a different search term.
+              </p>
+            ) : (
+              <div className="row row-cols-xl-5 row-cols-lg-4 row-cols-md-2 row-cols-1">
+                <Categories
+                  select={filteredProducts ? filteredProducts : storesProducts}
+                  selectHandler={selectHandler}
+                />
+              </div>
+            )}
 
-          {/* <div className="row row-cols-xl-5 row-cols-lg-4 row-cols-md-2 row-cols-1">
+            {/* <div className="row row-cols-xl-5 row-cols-lg-4 row-cols-md-2 row-cols-1">
             <Categories
               select={filteredProducts}
               selectHandler={selectHandler}
             />
           </div> */}
-          {/* <div className="row mt-4">
+            {/* <div className="row mt-4">
             <div className="col-12">
               <h5 className="mb-0">Top Categories</h5>
             </div>
@@ -135,8 +164,10 @@ export const Shop = () => {
               selectHandler={selectHandler}
             />
           </div> */}
+          </div>
         </div>
-      </div>
+      )}
+
       {/* <div
         className="modal fade"
         id="add-product"

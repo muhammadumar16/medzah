@@ -5,10 +5,12 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer, toast } from "react-toastify";
 import UserApi from "services/User.service";
+import { userProfile } from "store/users";
 import Loader from "utility/Loader";
 import * as yup from "yup";
 
 export const Profile = () => {
+  const dispatch = useDispatch();
   const updateProfile = useAPI(UserApi.updateProfile);
   const UserProfile = useAPI(UserApi.getUserProfile);
   const userProfileData = useSelector(
@@ -30,6 +32,9 @@ export const Profile = () => {
     zipCode,
     userID,
   } = UserData;
+  useEffect(() => {
+    dispatch(userProfile(userID));
+  }, []);
 
   useEffect(() => {
     feather.replace();

@@ -10,6 +10,7 @@ import { Profile } from "pages/PrivatePages/Profile";
 import { ChangePassword } from "pages/PublicPages/ChangePassword";
 import { ShoppingList } from "pages/PrivatePages/ShoppingList/ShoppingList";
 import { ShoppingListCart } from "pages/PrivatePages/ShoppingList/ShoppingListCart";
+import { OrdersPage } from "pages/PrivatePages/Orders/Orders";
 
 const AdminRouter = () => {
   useEffect(() => {
@@ -21,12 +22,13 @@ const AdminRouter = () => {
       <Route path="/" element={<Analytics />} />
       <Route path="/shop" element={<Shop />} />
       <Route path="/productdetails/:id" element={<ProductDetails />} />
+      <Route path="/shoppingcart" element={<ShoppingCart />} />
       <Route path="/shoppinglist" element={<ShoppingList />} />
       <Route path="/shoppinglistcart/:id" element={<ShoppingListCart />} />
-      <Route path="/shoppingcart" element={<ShoppingCart />} />
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/changepassword" element={<ChangePassword />} />
+      <Route path="/orders" element={<OrdersPage />} />
       <Route path="/*" element={<Navigate to="/" />} />
     </Routes>
   );

@@ -43,7 +43,7 @@ export const CARTITEMSHEADINGS = [
     name: "Qty",
   },
   {
-    id: 4,
+    id: 5,
     name: "Total",
   },
 ];

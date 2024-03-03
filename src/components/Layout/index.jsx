@@ -21,7 +21,7 @@ const Layout = ({
           {showFooter && <FooterPage />}
         </main>
       </div>
-      <Offcanvas />
+      {/* <Offcanvas /> */}
     </>
   );
 };

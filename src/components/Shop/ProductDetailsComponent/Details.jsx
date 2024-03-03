@@ -21,16 +21,15 @@ const Details = (props) => {
   } = item;
   const initialUnit = lstProductUnitAssociates[0];
   const [selectedUnit, setSelectedUnit] = useState(initialUnit);
-  const [price, setPrice] = useState(initialUnit.Price);
+  const [price, setPrice] = useState(initialUnit?.Price);
 
   const [createNewItem, setCreateNewItem] = useState(false);
   const [name, setName] = useState("");
-  const image = item?.lstProductImages[0]?.ProductImage;
+  const image = item?.lstProductImages?.[0]?.ProductImage;
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {}, [ListItems]);
   const handleCart = () => {
-    console.log("selected Unit", selectedUnit);
     try {
       dispatch(
         addToCart({
@@ -145,8 +144,8 @@ const Details = (props) => {
                         Existing Wishlists
                       </h5>
                       <div className="table-container">
-                        {ListItems.map((item) => (
-                          <div key={item.Id} className="table-row mb-3">
+                        {ListItems.map((item, index) => (
+                          <div key={index} className="table-row mb-3">
                             <div
                               className="table-cell"
                               data-bs-dismiss="modal"
@@ -155,14 +154,14 @@ const Details = (props) => {
                               onClick={() =>
                                 // navigate(`/shoppinglist/${item.id}`)
                                 // console.log("first")
-                                toast.success(`Product Added to ${item.name}`)
+                                toast.success(`Product Added to ${item?.name}`)
                               }
                             >
-                              {item.name}
+                              {item?.name}
                             </div>
 
                             <button
-                              onClick={() => handleRemoveList(item.Id)}
+                              onClick={() => handleRemoveList(item?.Id)}
                               className="btn btn-sm btn-danger"
                             >
                               Delete
@@ -203,7 +202,7 @@ const Details = (props) => {
             hideProgressBar
           />
           <div className="row align-items-center">
-            <h5>{item.ProductTitle}</h5>
+            <h5>{item?.ProductTitle}</h5>
           </div>
 
           {item?.sku !== " " && (
@@ -212,7 +211,7 @@ const Details = (props) => {
                 <span className="text-primary h5 me-2">
                   <i className="uil uil-check-circle align-middle" />
                 </span>
-                SKU#: {item.Sku}
+                SKU#: {item?.Sku}
               </li>
             </ul>
           )}
@@ -222,7 +221,7 @@ const Details = (props) => {
                 <span className="text-primary h5 me-2">
                   <i className="uil uil-check-circle align-middle" />
                 </span>
-                Manufacture Name: {item.ManufactureName}
+                Manufacture Name: {item?.ManufactureName}
               </li>
             </ul>
           )}
@@ -232,7 +231,7 @@ const Details = (props) => {
                 <span className="text-primary h5 me-2">
                   <i className="uil uil-check-circle align-middle" />
                 </span>
-                Manufacture#: {item.ManufactureNo}
+                Manufacture#: {item?.ManufactureNo}
               </li>
             </ul>
           )}
@@ -241,11 +240,11 @@ const Details = (props) => {
               <span className="text-primary h5 me-2">
                 <i className="uil uil-check-circle align-middle" />
               </span>
-              Price: {currencySymbol} {price.toFixed(2)}
+              Price: {currencySymbol} {price?.toFixed(2)}
             </li>
           </ul>
-          {item.lstProductUnitAssociates &&
-            item.lstProductUnitAssociates.length > 0 && (
+          {item?.lstProductUnitAssociates &&
+            item?.lstProductUnitAssociates?.length > 0 && (
               <div className="d-flex align-items-center">
                 <ul className="list-unstyled text-muted mb-0 me-2">
                   <li className="mb-0">
@@ -261,7 +260,7 @@ const Details = (props) => {
                   value={selectedUnit.UnitID || "default"}
                   onChange={(e) => {
                     const unitId = e.target.value;
-                    const unit = item.lstProductUnitAssociates.find(
+                    const unit = item?.lstProductUnitAssociates?.find(
                       (u) => u.UnitID.toString() === unitId
                     );
                     if (unit) {
@@ -273,10 +272,10 @@ const Details = (props) => {
                   }}
                 >
                   {/* <option value="default">Select</option> */}
-                  {item.lstProductUnitAssociates.map((unit) => (
+                  {item?.lstProductUnitAssociates?.map((unit) => (
                     <option key={unit.UnitID} value={unit.UnitID}>
                       {unit.UnitTitle} - {currencySymbol}
-                      {unit.Price.toFixed(2)}
+                      {unit?.Price.toFixed(2)}
                     </option>
                   ))}
                 </select>

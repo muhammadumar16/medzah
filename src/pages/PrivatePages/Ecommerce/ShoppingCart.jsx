@@ -47,27 +47,31 @@ export const ShoppingCart = () => {
   }, [cartItems]);
 
   const lstshoppingDetails = cartItems.map((item) => ({
-    ShoppingCardDetailID: item.Id,
-    ShoppingCartID: 123,
+    ShoppingListDetailID: item.Id,
+    ShoppingListID: 123,
+    // ProductID: item.ProductID === undefined ? item.Id : item.ProductID,
     ProductID: item.ProductID,
     Quantity: item.quantity,
     UnitID: item.UnitID,
   }));
 
   const ListData = {
-    ShoppingCartID: 0,
-    ShoppingCartTitle: name,
+    ShoppingListID: 0,
+    ShoppingListTitle: name,
     Inactive: false,
     Remarks: remarks,
     lstshoppingDetails,
   };
-
+  console.log("List Data Before Call=>>>", ListData);
   // const handleAddToList = async ({ itemID, itemName, itemRemarks }) => {
   const handleAddToList = async () => {
+    console.log("List Data=>>>>>", ListData);
     if (name && remarks) {
       try {
         setLoading(true);
         const result = await setShoppingList.request(ListData);
+        console.log("Results", result);
+
         if (result.data.Status === 101) {
           toast.success("Shopping List Created Successfully !! ");
           dispatch(GetAllShoppingList());
@@ -83,7 +87,7 @@ export const ShoppingCart = () => {
       //     setLoading(true);
       //     const result = await setShoppingList.request({
       //       ...ListData,
-      //       ShoppingCartID: itemID,
+      //       ShoppingListID: itemID,
       //     });
       //     if (result.data.Status === 101) {
       //       toast.success(`Added to Shoppinglist ${itemRemarks}`);
@@ -198,18 +202,18 @@ export const ShoppingCart = () => {
                     <div className="table-responsive bg-white rounded shadow">
                       <table className="table table-center table-padding mb-0">
                         <tbody>
-                          <tr>
+                          {/* <tr>
                             <td className="h6 ps-4 py-3">Subtotal</td>
                             <td className="text-end fw-bold pe-4">
                               {currencySymbol} {subtotal.toFixed(2)}
                             </td>
-                          </tr>
-                          <tr>
+                          </tr> */}
+                          {/* <tr>
                             <td className="h6 ps-4 py-3">Taxes</td>
                             <td className="text-end fw-bold pe-4">
                               {currencySymbol} {taxes.toFixed(2)}
                             </td>
-                          </tr>
+                          </tr> */}
                           <tr className="bg-light">
                             <td className="h6 ps-4 py-3">Total</td>
                             <td className="text-end fw-bold pe-4">
@@ -329,7 +333,7 @@ export const ShoppingCart = () => {
                                   onClick={() => {
                                     handleAddToList({
                                       itemName: item.ShoppingCartTitle,
-                                      itemID: item.ShoppingCartID,
+                                      itemID: item.ShoppingListID,
                                       itemRemarks: item.Remarks,
                                     });
                                   }}
@@ -346,7 +350,7 @@ export const ShoppingCart = () => {
                                 </div>
                                 <button
                                   onClick={() =>
-                                    handleRemoveList(item.ShoppingCartID)
+                                    handleRemoveList(item.ShoppingListID)
                                   }
                                   className="btn btn-sm btn-danger"
                                   data-bs-dismiss="modal"

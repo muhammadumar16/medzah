@@ -5,9 +5,9 @@ const ApiClient = create({
 });
 
 ApiClient.addRequestTransform((req) => {
-  console.log("Request => ", req);
+  // console.log("Request => ", req);
   const user = JSON.parse(localStorage.getItem("loggedUserInfo"));
-  console.log("User Token => ", user?.loginToken);
+  // console.log("User Token => ", user?.loginToken);
 
   if (user) req.headers["authorization"] = `${user?.loginToken}`;
 });

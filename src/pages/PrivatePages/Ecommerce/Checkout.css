@@ -1,0 +1,27 @@
+.searchwid {
+  width: 600px !important; /* Default width */
+}
+
+@media (max-width: 850px) {
+  .searchwid {
+    width: calc(100% - 20px) !important; /* Adjust as needed */
+  }
+}
+
+@media (max-width: 600px) {
+  .searchwid {
+    width: calc(100% - 10px) !important; /* Adjust as needed */
+  }
+}
+
+@media (max-width: 400px) {
+  .searchwid {
+    width: calc(100% - 5px) !important; /* Adjust as needed */
+  }
+}
+.custom-datepicker {
+  background-color: rgb(5, 60, 241);
+  border-color: rgb(5, 60, 241);
+  margin-right: 100px; /* Adjust as needed */
+  color: azure;
+}

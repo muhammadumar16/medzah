@@ -1,360 +1,379 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import { CARTITEMSHEADINGS } from "constants/cartItems";
+import { forwardRef, useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+// import "./model.css";
+import CheckoutDetails from "components/Shop/CheckOut/CheckoutDetails";
+import DatePicker from "react-datepicker";
+import Loader from "utility/Loader";
+
+import useAPI from "hooks/useAPI";
+import "react-datepicker/dist/react-datepicker.css";
+import ProductApi from "services/Product.service";
+import { removeAllCartItems, setAllAddress } from "store/cart";
+import "./Checkout.css";
 
 export const Checkout = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const searchRef = useRef(null);
+  const saveShipmentAddress = useAPI(ProductApi.saveShipmentAddress);
+  const getAllAddress = useAPI(ProductApi.getAllAddress);
+  const checkOut = useAPI(ProductApi.checkOut);
+  const cartItems = useSelector((state) => state?.entities?.cart?.cart);
+  const alladdress = useSelector((state) => state?.entities?.cart?.allAddress);
+
+  const [showTextarea, setShowTextarea] = useState(false);
+  const [textareaValue, setTextareaValue] = useState("");
+  const [startDate, setStartDate] = useState(new Date());
+  const [searchResults, setSearchResults] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [buttonVisible, setButtonVisible] = useState(true);
+  const [shipmentAddressId, setShipmentAddressId] = useState();
+  const [purchaseNo, setPurchaseNo] = useState();
+  const [loading, setLoading] = useState(false);
+
+  const filterAddress = (searchTerm) => {
+    console.log(searchTerm);
+    return alladdress.filter((address) =>
+      address.ShipmentAddress.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  };
+  useEffect(() => {
+    const fetchdata = async () => {
+      try {
+        const results = await getAllAddress.request();
+        const data = results?.data?.Data;
+        dispatch(setAllAddress(data));
+      } catch (error) {
+        console.log("error", error);
+      }
+    };
+    fetchdata();
+  }, [dispatch]);
+
+  const saveShipmentHandler = async () => {
+    const data = {
+      ShipmentAddressID: 0,
+      ShipmentAddress: searchTerm,
+      Remarks: "This is a sample shipment address",
+    };
+
+    if (searchTerm) {
+      try {
+        setLoading(true);
+        const result = await saveShipmentAddress.request(data);
+        console.log("result-=>>>", result);
+        if (result.data.Status === 101) {
+          const results = await getAllAddress.request();
+          dispatch(setAllAddress(result?.data?.Data));
+          toast.success("Address Saved Successfully !! ");
+        }
+      } catch (error) {
+        console.log("Error While Saving Address", error);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      toast.warning("Please Provide The Address !! ");
+    }
+  };
+
+  const handleTextareaChange = (event) => {
+    setTextareaValue(event.target.value);
+  };
+
+  const handleShoppingInstrutions = () => {
+    setShowTextarea(!showTextarea);
+  };
+
+  const handleTextareaBlur = () => {
+    setShowTextarea(false);
+  };
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    setButtonVisible(true);
+    if (value.length > 0) {
+      const filteredResults = filterAddress(value);
+      setSearchResults(filteredResults);
+    } else {
+      setSearchResults([]);
+    }
+  };
+  const handleClickOutside = (e) => {
+    if (searchRef.current && !searchRef.current.contains(e.target)) {
+      setSearchResults([]);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+
+  const ExampleCustomInput = forwardRef(({ value, onClick }, ref) => (
+    <button className="custom-datepicker" onClick={onClick} ref={ref}>
+      {value}
+    </button>
+  ));
+
+  const day = startDate.getDate().toString().padStart(2, "0");
+  const month = (startDate.getMonth() + 1).toString().padStart(2, "0"); // Month is zero-based
+  const year = startDate.getFullYear();
+  const formattedDate = `${month}/${day}/${year}`;
+
+  const lstOrderDetails = cartItems.map((item) => ({
+    ShoppingListDetailID: item.Id,
+    ShoppingListID: 123,
+    ProductId: item.ProductID,
+    Quantity: item.quantity,
+    UnitID: item.UnitID,
+  }));
+  const OrderInfoData = {
+    OrderId: 0,
+    OrderNo: "123456",
+    UserId: 789,
+    OrderStatus: 1,
+    Remarks: textareaValue,
+    PurchaseOrderNo: purchaseNo,
+    ShippingDate: formattedDate,
+    ShipmentAddressID: shipmentAddressId,
+    lstOrderDetails,
+  };
+
+  const checkOutHandler = async () => {
+    console.log("orderDtaa to send", OrderInfoData);
+    try {
+      setLoading(true);
+      const results = await checkOut.request(OrderInfoData);
+      console.log("result-=>>>", results);
+      if (results.data.Status === 101) {
+        toast.success("Order Placed Successfully");
+        setTimeout(() => {
+          navigate("/");
+          dispatch(removeAllCartItems());
+        }, 500);
+      }
+      if (results.data.Status === 107) {
+        toast.error("SomeThing Went Wrong Contact Admin");
+      }
+    } catch (error) {
+      console.log("error", error);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
-    <div className="layout-specing">
-      <div className="d-md-flex justify-content-between align-items-center">
-        <h5 className="mb-0">Checkout</h5>
-        <nav aria-label="breadcrumb" className="d-inline-block mt-2 mt-sm-0">
-          <ul className="breadcrumb bg-transparent rounded mb-0 p-0">
-            <li className="breadcrumb-item text-capitalize">
-              <Link to="/">Medzah</Link>
-            </li>
-            <li className="breadcrumb-item text-capitalize">
-              <Link to="/shop">Shop</Link>
-            </li>
-            <li
-              className="breadcrumb-item text-capitalize active"
-              aria-current="page"
+    <>
+      <ToastContainer
+        position="top-center"
+        autoClose={1000}
+        hideProgressBar
+        style={{ width: "350px" }}
+      />
+      {loading ? (
+        <Loader />
+      ) : (
+        <div className="layout-specing">
+          <div className="d-md-flex justify-content-between align-items-center">
+            <h5 className="mb-0">Checkout</h5>
+            <nav
+              aria-label="breadcrumb"
+              className="d-inline-block mt-2 mt-sm-0"
             >
-              Checkout
-            </li>
-          </ul>
-        </nav>
-      </div>
-      <div className="row">
-        <div className="col-md-5 col-lg-4 order-md-last mt-4">
-          <div className="card rounded shadow p-4 border-0">
-            <div className="d-flex justify-content-between align-items-center mb-3">
-              <span className="h5 mb-0">Your cart</span>
-              <span className="badge bg-primary rounded-pill">3</span>
-            </div>
-            <ul className="list-group mb-3 border">
-              <li className="d-flex justify-content-between lh-sm p-3 border-bottom">
-                <div>
-                  <h6 className="my-0">Product name</h6>
-                  <small className="text-muted">Brief description</small>
-                </div>
-                <span className="text-muted">$12</span>
-              </li>
-              <li className="d-flex justify-content-between lh-sm p-3 border-bottom">
-                <div>
-                  <h6 className="my-0">Second product</h6>
-                  <small className="text-muted">Brief description</small>
-                </div>
-                <span className="text-muted">$8</span>
-              </li>
-              <li className="d-flex justify-content-between lh-sm p-3 border-bottom">
-                <div>
-                  <h6 className="my-0">Third item</h6>
-                  <small className="text-muted">Brief description</small>
-                </div>
-                <span className="text-muted">$5</span>
-              </li>
-              <li className="d-flex justify-content-between bg-light p-3 border-bottom">
-                <div className="text-success">
-                  <h6 className="my-0">Promo code</h6>
-                  <small>EXAMPLECODE</small>
-                </div>
-                <span className="text-success">−$5</span>
-              </li>
-              <li className="d-flex justify-content-between p-3">
-                <span>Total (USD)</span>
-                <strong>$20</strong>
-              </li>
-            </ul>
-            <form>
-              <div className="input-group">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Promo code"
-                />
-                <button type="submit" className="btn btn-secondary">
-                  Redeem
-                </button>
-              </div>
-            </form>
+              <ul className="breadcrumb bg-transparent rounded mb-0 p-0">
+                <li className="breadcrumb-item text-capitalize">
+                  <Link to="/">Medzah</Link>
+                </li>
+                <li className="breadcrumb-item text-capitalize">
+                  <Link to="/shop">Shop</Link>
+                </li>
+                <li className="breadcrumb-item text-capitalize">
+                  <Link to="/shoppingcart">Cart</Link>
+                </li>
+                <li
+                  className="breadcrumb-item text-capitalize active"
+                  aria-current="page"
+                >
+                  Checkout
+                </li>
+              </ul>
+            </nav>
           </div>
-        </div>
-        {/*end col*/}
-        <div className="col-md-7 col-lg-8 mt-4">
-          <div className="card rounded shadow p-4 border-0">
-            <h4 className="mb-3">Billing address</h4>
-            <form className="needs-validation" noValidate>
-              <div className="row g-3">
-                <div className="col-sm-6">
-                  <label htmlFor="firstName" className="form-label">
-                    First name
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="firstName"
-                    placeholder="First Name"
-                    defaultValue
-                    required
+          <div className="row">
+            <div className="col-lg-8 col-md-6 mt-4">
+              <Link to="/shoppingcart" className="btn btn-sm btn-danger ms-2">
+                Go To Shopping Cart
+              </Link>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-12 mt-4">
+              <CheckoutDetails
+                select={cartItems}
+                headings={CARTITEMSHEADINGS}
+              />
+            </div>
+          </div>
+          <div
+            className="col-12 row bg-white shadow rounded mt-2 mb-2 ml-2"
+            style={{ marginLeft: "1px" }}
+          >
+            <div className="col-4 ">
+              <div className="w-100 mt-4 ">
+                <span
+                  onClick={handleShoppingInstrutions}
+                  style={{ cursor: "pointer" }}
+                  className="btn btn-sm btn-outline-info"
+                >
+                  Add Shopping Instructions
+                </span>
+              </div>
+              <div className="w-100 mt-2 ">
+                {showTextarea && (
+                  <textarea
+                    value={textareaValue}
+                    onChange={handleTextareaChange}
+                    onBlur={handleTextareaBlur}
+                    maxLength={500}
+                    style={{ width: "100%", maxWidth: "200px" }}
                   />
-                  <div className="invalid-feedback">
-                    Valid first name is required.
-                  </div>
-                </div>
-                <div className="col-sm-6">
-                  <label htmlFor="lastName" className="form-label">
-                    Last name
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="lastName"
-                    placeholder="Last Name"
-                    defaultValue
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Valid last name is required.
-                  </div>
-                </div>
-                <div className="col-12">
-                  <label htmlFor="username" className="form-label">
-                    Username
-                  </label>
-                  <div className="input-group has-validation">
-                    <span className="input-group-text bg-light text-muted border">
-                      @
-                    </span>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="username"
-                      placeholder="Username"
-                      required
-                    />
-                    <div className="invalid-feedback">
-                      {" "}
-                      Your username is required.{" "}
+                )}
+              </div>
+            </div>
+            <div className="col-4 mt-4">
+              <p
+                className="mb-1"
+                style={{ textDecoration: "underline", width: "100%" }}
+              >
+                Required Purchase Order No #
+              </p>
+
+              <input
+                type="text"
+                placeholder="Enter Purchase Order No"
+                title="Only numbers and dashes are allowed"
+                value={purchaseNo}
+                onChange={(e) => setPurchaseNo(e.target.value)}
+              />
+
+              <p>Please use only letters, numbers or dashes</p>
+            </div>
+            <div className="col-4 mt-4">
+              <span style={{ textDecoration: "underline" }}>
+                Base DC: <strong>PEN</strong>{" "}
+              </span>
+              <p style={{ textDecoration: "underline" }} className="mb-1">
+                Shipping Method : <strong>----FEDEXGRNG</strong>
+              </p>
+              <span style={{ textDecoration: "underline" }}>
+                Assigned Ship Day :
+              </span>
+            </div>
+            <div className="text-end mb-5 mt-5">
+              <span> Select The Shipping Day </span>
+              {/* <DatePicker
+              selected={startDate}
+              onChange={(date) => setStartDate(date)}
+              className="custom-datepicker"
+            /> */}
+              <DatePicker
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+                customInput={<ExampleCustomInput />}
+              />
+            </div>
+          </div>
+          <div className="card">
+            <div className="card-body">
+              <div className="row">
+                <div className="col-md-8">
+                  <div className="search-bar p-0 mt-3">
+                    <div id="search" className="menu-search mb-0">
+                      <form>
+                        <div className="position-relative" ref={searchRef}>
+                          <label
+                            htmlFor="s"
+                            className="form-label required-label mx-1"
+                          >
+                            Search Address
+                            <span className="text-danger">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control border rounded me-2 searchwid"
+                            name="s"
+                            id="s"
+                            placeholder="Search Address"
+                            value={searchTerm}
+                            onChange={handleSearchChange}
+                          />
+                          <div
+                            className="search-results position-absolute p-2 "
+                            style={{
+                              width: 600,
+                              maxHeight: 300,
+                              overflowY: "auto",
+                              zIndex: 1000,
+                              backgroundColor: "white",
+                            }}
+                          >
+                            {searchResults.map((address, index) => (
+                              <span
+                                key={address.ShipmentAddressID}
+                                onClick={() => {
+                                  setSearchResults([]);
+                                  setSearchTerm(address.ShipmentAddress);
+                                  setButtonVisible(!buttonVisible);
+                                  setShipmentAddressId(
+                                    address.ShipmentAddressID
+                                  );
+                                }}
+                                className="list-group-item list-group-item-action d-flex align-items-center"
+                                style={{
+                                  borderBottom:
+                                    index !== searchResults.length - 1
+                                      ? "1px solid #ddd"
+                                      : "none",
+                                  padding: "10px 0",
+                                  cursor: "pointer", // Adjust padding as needed
+                                }}
+                              >
+                                <span>{address.ShipmentAddress}</span>
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </form>
                     </div>
                   </div>
                 </div>
-                <div className="col-12">
-                  <label htmlFor="email" className="form-label">
-                    Email <span className="text-muted">(Optional)</span>
-                  </label>
-                  <input
-                    type="email"
-                    className="form-control"
-                    id="email"
-                    placeholder="you@example.com"
-                  />
-                  <div className="invalid-feedback">
-                    Please enter a valid email address for shipping updates.
-                  </div>
-                </div>
-                <div className="col-12">
-                  <label htmlFor="address" className="form-label">
-                    Address
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="address"
-                    placeholder="1234 Main St"
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Please enter your shipping address.
-                  </div>
-                </div>
-                <div className="col-12">
-                  <label htmlFor="address2" className="form-label">
-                    Address 2 <span className="text-muted">(Optional)</span>
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="address2"
-                    placeholder="Apartment or suite"
-                  />
-                </div>
-                <div className="col-md-5">
-                  <label htmlFor="country" className="form-label">
-                    Country
-                  </label>
-                  <select
-                    className="form-select form-control"
-                    id="country"
-                    required
-                  >
-                    <option value>Choose...</option>
-                    <option>United States</option>
-                  </select>
-                  <div className="invalid-feedback">
-                    Please select a valid country.
-                  </div>
-                </div>
-                <div className="col-md-4">
-                  <label htmlFor="state" className="form-label">
-                    State
-                  </label>
-                  <select
-                    className="form-select form-control"
-                    id="state"
-                    required
-                  >
-                    <option value>Choose...</option>
-                    <option>California</option>
-                  </select>
-                  <div className="invalid-feedback">
-                    Please provide a valid state.
-                  </div>
-                </div>
-                <div className="col-md-3">
-                  <label htmlFor="zip" className="form-label">
-                    Zip
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="zip"
-                    placeholder
-                    required
-                  />
-                  <div className="invalid-feedback">Zip code required.</div>
+                <div className="col-md-4 mt-5">
+                  {buttonVisible && (
+                    <button
+                      className="btn btn-success "
+                      onClick={saveShipmentHandler}
+                    >
+                      Save
+                    </button>
+                  )}
                 </div>
               </div>
-              <div className="form-check mt-4 pt-4 border-top">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  id="same-address"
-                />
-                <label className="form-check-label" htmlFor="same-address">
-                  Shipping address is the same as my billing address
-                </label>
-              </div>
-              <div className="form-check">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  id="save-info"
-                />
-                <label className="form-check-label" htmlFor="save-info">
-                  Save this information for next time
-                </label>
-              </div>
-              <h4 className="mb-3 mt-4 pt-4 border-top">Payment</h4>
-              <div className="my-3">
-                <div className="form-check">
-                  <input
-                    id="credit"
-                    name="paymentMethod"
-                    type="radio"
-                    className="form-check-input"
-                    defaultChecked
-                    required
-                  />
-                  <label className="form-check-label" htmlFor="credit">
-                    Credit card
-                  </label>
-                </div>
-                <div className="form-check">
-                  <input
-                    id="debit"
-                    name="paymentMethod"
-                    type="radio"
-                    className="form-check-input"
-                    required
-                  />
-                  <label className="form-check-label" htmlFor="debit">
-                    Debit card
-                  </label>
-                </div>
-                <div className="form-check">
-                  <input
-                    id="paypal"
-                    name="paymentMethod"
-                    type="radio"
-                    className="form-check-input"
-                    required
-                  />
-                  <label className="form-check-label" htmlFor="paypal">
-                    PayPal
-                  </label>
-                </div>
-              </div>
-              <div className="row gy-3">
-                <div className="col-md-6">
-                  <label htmlFor="cc-name" className="form-label">
-                    Name on card
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="cc-name"
-                    placeholder
-                    required
-                  />
-                  <small className="text-muted">
-                    Full name as displayed on card
-                  </small>
-                  <div className="invalid-feedback">
-                    Name on card is required
-                  </div>
-                </div>
-                <div className="col-md-6">
-                  <label htmlFor="cc-number" className="form-label">
-                    Credit card number
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="cc-number"
-                    placeholder
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Credit card number is required
-                  </div>
-                </div>
-                <div className="col-md-3 mb-3">
-                  <label htmlFor="cc-expiration" className="form-label">
-                    Expiration
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="cc-expiration"
-                    placeholder
-                    required
-                  />
-                  <div className="invalid-feedback">
-                    Expiration date required
-                  </div>
-                </div>
-                <div className="col-md-3 mb-3">
-                  <label htmlFor="cc-cvv" className="form-label">
-                    CVV
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    id="cc-cvv"
-                    placeholder
-                    required
-                  />
-                  <div className="invalid-feedback">Security code required</div>
-                </div>
-              </div>
-              <button className="w-100 btn btn-primary" type="submit">
-                Continue to checkout
-              </button>
-            </form>
+            </div>
+          </div>
+
+          <div className="mt-4 text-end">
+            <button className="btn btn-success" onClick={checkOutHandler}>
+              Checkout
+            </button>
           </div>
         </div>
-        {/*end col*/}
-      </div>
-      {/*end row*/}
-    </div>
+      )}
+    </>
   );
 };

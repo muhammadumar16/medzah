@@ -104,7 +104,7 @@ function HeaderPage() {
     <div className="top-header">
       <div className="header-bar d-flex justify-content-between">
         <div className="d-flex align-items-center">
-          <a href="#" className="logo-icon me-3">
+          <Link to="#" className="logo-icon me-3">
             <img
               src="/assets/images/logo-icon.png"
               height={30}
@@ -125,15 +125,15 @@ function HeaderPage() {
                 alt="...."
               />
             </span>
-          </a>
-          <a
+          </Link>
+          <Link
             id="close-sidebar"
             className="btn btn-icon btn-soft-light"
-            href="javascript:void(0)"
+            to="#"
           >
             <i className="ti ti-menu-2" />
-          </a>
-          <div className="search-bar p-0 d-none d-md-block ms-2">
+          </Link>
+          <div className="search-bar p-0  ms-2">
             <div id="search" className="menu-search mb-0">
               <form>
                 <div className="position-relative" ref={searchRef}>
@@ -142,7 +142,7 @@ function HeaderPage() {
                     className="form-control border rounded me-2 searchwid"
                     name="s"
                     id="s"
-                    placeholder="Search Keywords..."
+                    placeholder="Search Products by Name or SKU"
                     value={searchTerm}
                     onChange={handleSearchChange}
                   />
@@ -205,11 +205,11 @@ function HeaderPage() {
           </div>
         </div>
         <ul className="list-unstyled mb-0">
-          <li class="list-inline-item mb-0 mx-2">
+          <li className="list-inline-item mb-0 mx-2">
             <Link to="/shoppingcart">
-              <div class="btn btn-icon btn-soft-light position-relative">
-                <i class="ti ti-shopping-cart"></i>
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              <div className="btn btn-icon btn-soft-light position-relative">
+                <i className="ti ti-shopping-cart"></i>
+                <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                   {getTotalQuantity() || 0}
                 </span>
               </div>

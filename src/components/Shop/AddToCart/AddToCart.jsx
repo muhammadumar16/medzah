@@ -7,7 +7,6 @@ import UnitSelector from "./UnitSelector";
 
 const AddToCart = (props) => {
   const { select, headings } = props;
-  console.log("Select Add to cart", select);
   const dispatch = useDispatch();
   const [selectedUnits, setSelectedUnits] = useState({});
 
@@ -60,6 +59,7 @@ const AddToCart = (props) => {
         itemId: item.Id,
         unitId: parsedUnitId,
         UnitTitle: unit.UnitTitle,
+        Price: unit.Price,
       })
     );
   };
@@ -120,6 +120,7 @@ const AddToCart = (props) => {
                 selectedUnit={selectedUnits[item.Id]}
                 handleUnitChange={handleUnitChange}
               />
+
               <td className="text-center qty-icons">
                 <QuantityControl
                   initialQuantity={item.quantity}
@@ -128,7 +129,8 @@ const AddToCart = (props) => {
                 />
               </td>
               <td className="text-end fw-bold pe-4">
-                {currencySymbol} {(item?.quantity * item?.Price).toFixed(2)}
+                {currencySymbol}{" "}
+                {(item?.quantity * selectedUnits?.[item.Id]?.Price).toFixed(2)}
               </td>
             </tr>
           ))}

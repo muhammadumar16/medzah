@@ -2,26 +2,20 @@
   width: 600px !important; /* Default width */
 }
 
-@media (max-width: 500px) {
-  .searchwid {
-    width: calc(80% - 20px) !important; /* Adjust as needed */
-  }
-}
-
 @media (max-width: 850px) {
   .searchwid {
-    width: calc(200%) !important; /* Adjust as needed */
+    width: calc(100% - 20px) !important; /* Adjust as needed */
   }
 }
 
 @media (max-width: 600px) {
   .searchwid {
-    width: calc(80% - 10px) !important; /* Adjust as needed */
+    width: calc(100% - 10px) !important; /* Adjust as needed */
   }
 }
 
 @media (max-width: 400px) {
   .searchwid {
-    width: calc(80% - 5px) !important; /* Adjust as needed */
+    width: calc(100% - 5px) !important; /* Adjust as needed */
   }
 }

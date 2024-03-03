@@ -19,9 +19,9 @@
 //           (u) => u.UnitID === item.UnitID
 //         );
 //         if (preSelectedUnit) {
-//           initialUnits[item.ShoppingCardDetailID] = preSelectedUnit;
+//           initialUnits[item.ShoppingListDetailID] = preSelectedUnit;
 //         } else if (item.lstProductUnitAssociates.length > 0) {
-//           initialUnits[item.ShoppingCardDetailID] =
+//           initialUnits[item.ShoppingListDetailID] =
 //             item.lstProductUnitAssociates[0];
 //         }
 //       }
@@ -37,7 +37,7 @@
 
 //     setSelectedUnits((prevUnits) => ({
 //       ...prevUnits,
-//       [item.ShoppingCardDetailID]: {
+//       [item.ShoppingListDetailID]: {
 //         ...unit,
 //         UnitID: parsedUnitId,
 //       },
@@ -45,7 +45,7 @@
 
 //     dispatch(
 //       updateUnitId({
-//         itemId: item.ShoppingCardDetailID,
+//         itemId: item.ShoppingListDetailID,
 //         unitId: parsedUnitId,
 //         UnitTitle: unit.UnitTitle,
 //       })
@@ -79,7 +79,7 @@
 //         </thead>
 //         <tbody>
 //           {select?.lstshoppingDetails?.map((item) => (
-//             <tr key={item.ShoppingCardDetailID} className="shop-list">
+//             <tr key={item.ShoppingListDetailID} className="shop-list">
 //               <td>
 //                 <div className="d-flex align-items-center">
 //                   {item.lstProductImages &&
@@ -96,17 +96,17 @@
 //               </td>
 //               <td className="text-center">
 //                 {currencySymbol}{" "}
-//                 {selectedUnits?.item.ShoppingCardDetailID?.Price.toFixed(2)}
+//                 {selectedUnits?.item.ShoppingListDetailID?.Price.toFixed(2)}
 //               </td>
 //               <UnitSelector
 //                 item={item}
-//                 selectedUnit={selectedUnits[item.ShoppingCardDetailID]}
+//                 selectedUnit={selectedUnits[item.ShoppingListDetailID]}
 //                 handleUnitChange={handleUnitChange}
 //               />
 //               <td className="text-center qty-icons">
 //                 <QuantityControl
 //                   initialQuantity={item.Quantity}
-//                   Id={item.ShoppingCardDetailID}
+//                   Id={item.ShoppingListDetailID}
 //                   quantity={item.Quantity}
 //                 />
 //               </td>
@@ -143,7 +143,7 @@ const ShoppingListCart = ({ select, headings }) => {
         Array.isArray(item.lstProductUnitAssociates) &&
         item.lstProductUnitAssociates.length
       ) {
-        initialUnits[item.ShoppingCardDetailID] =
+        initialUnits[item.ShoppingListDetailID] =
           item.lstProductUnitAssociates.find((u) => u.UnitID === item.UnitID) ||
           item.lstProductUnitAssociates[0];
       }
@@ -159,14 +159,15 @@ const ShoppingListCart = ({ select, headings }) => {
 
     setSelectedUnits((prevUnits) => ({
       ...prevUnits,
-      [item.ShoppingCardDetailID]: unit,
+      [item.ShoppingListDetailID]: unit,
     }));
 
     dispatch(
       updateShoppingListUnitId({
-        itemId: item.ShoppingCardDetailID,
+        itemId: item.ShoppingListDetailID,
         unitId: parsedUnitId,
         UnitTitle: unit.UnitTitle,
+        Price: unit.Price,
       })
     );
   };
@@ -209,13 +210,13 @@ const ShoppingListCart = ({ select, headings }) => {
             </thead>
             <tbody>
               {select?.lstshoppingDetails?.map((item) => (
-                <tr key={item.ShoppingCardDetailID} className="shop-list">
+                <tr key={item.ShoppingListDetailID} className="shop-list">
                   <td className="h6 text-center">
                     <button
                       style={{ border: "none", backgroundColor: "transparent" }}
                       onClick={() =>
                         dispatch(
-                          removeShoppingListItem(item.ShoppingCardDetailID)
+                          removeShoppingListItem(item.ShoppingListDetailID)
                         )
                       }
                       className="text-danger"
@@ -238,17 +239,17 @@ const ShoppingListCart = ({ select, headings }) => {
                   </td>
                   <td className="text-center">
                     {currencySymbol}{" "}
-                    {selectedUnits[item.ShoppingCardDetailID]?.Price.toFixed(2)}
+                    {selectedUnits[item.ShoppingListDetailID]?.Price.toFixed(2)}
                   </td>
                   <UnitSelector
                     item={item}
-                    selectedUnit={selectedUnits[item.ShoppingCardDetailID]}
+                    selectedUnit={selectedUnits[item.ShoppingListDetailID]}
                     handleUnitChange={handleUnitChange}
                   />
                   <td className="text-center qty-icons">
                     <QuantityControl
                       initialQuantity={item.Quantity}
-                      Id={item.ShoppingCardDetailID}
+                      Id={item.ShoppingListDetailID}
                       quantity={item.Quantity}
                     />
                   </td>
@@ -256,7 +257,7 @@ const ShoppingListCart = ({ select, headings }) => {
                     {currencySymbol}{" "}
                     {(
                       item.Quantity *
-                      selectedUnits[item.ShoppingCardDetailID]?.Price
+                      selectedUnits[item.ShoppingListDetailID]?.Price
                     ).toFixed(2)}
                   </td>
                 </tr>
